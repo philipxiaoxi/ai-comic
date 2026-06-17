@@ -1,0 +1,15 @@
+{
+  "name": "browser-remote-control-cli",
+  "version": "1.0.0",
+  "description": "CLI for browser remote control",
+  "bin": {
+    "browser-cli": "./bin/browser-cli.js"
+  },
+  "scripts": {
+    "start": "node bin/browser-cli.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  }
+}

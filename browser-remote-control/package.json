@@ -1,0 +1,15 @@
+{
+  "name": "browser-remote-control",
+  "version": "1.0.0",
+  "description": "Three-layer architecture CLI browser remote control tool",
+  "private": true,
+  "workspaces": [
+    "cli",
+    "server"
+  ],
+  "scripts": {
+    "server": "cd server && npm start",
+    "cli": "cd cli && node bin/browser-cli.js",
+    "install:all": "npm install && cd cli && npm install && cd ../server && npm install"
+  }
+}
