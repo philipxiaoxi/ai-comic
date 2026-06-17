@@ -6,8 +6,8 @@ const navigate = new Command('navigate')
   .description('Navigate browser to a URL')
   .requiredOption('-u, --url <url>', 'URL to navigate to')
   .option('-t, --tab-id <id>', 'Optional tab ID')
-  .action(async (opts) => {
-    const server = process.env.BROWSER_CLI_SERVER || 'http://localhost:3000';
+  .action(async (opts, command) => {
+    const server = command.parent?.opts?.()?.server || process.env.BROWSER_CLI_SERVER || 'http://localhost:3000';
     try {
       console.log(chalk.blue(`Navigating to: ${opts.url}`));
       const result = await apiClient.navigate(server, opts.url, opts.tabId);

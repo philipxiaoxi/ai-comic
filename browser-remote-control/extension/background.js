@@ -12,6 +12,17 @@ function generatePluginId() {
   return 'plugin-' + Math.random().toString(36).substr(2, 9);
 }
 
+function broadcastConnectionState() {
+  chrome.tabs.query({}, (tabs) => {
+    tabs.forEach(tab => {
+      chrome.tabs.sendMessage(tab.id, {
+        type: 'connectionState',
+        connected: connectionState === 'connected'
+      }).catch(() => {});
+    });
+  });
+}
+
 function connect() {
   if (ws && ws.readyState === WebSocket.OPEN) {
     return;
@@ -19,6 +30,7 @@ function connect() {
 
   connectionState = 'connecting';
   updateBadge();
+  broadcastConnectionState();
 
   try {
     ws = new WebSocket(DEFAULT_SERVER_URL);
@@ -28,6 +40,7 @@ function connect() {
       connectionState = 'connected';
       reconnectAttempts = 0;
       updateBadge();
+      broadcastConnectionState();
 
       if (!pluginId) {
         pluginId = generatePluginId();
@@ -56,6 +69,7 @@ function connect() {
       console.log('WebSocket disconnected');
       connectionState = 'disconnected';
       updateBadge();
+      broadcastConnectionState();
       scheduleReconnect();
     };
 
@@ -92,6 +106,18 @@ async function handleMessage(message) {
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: 'pong' }));
       }
+      break;
+
+    case 'reconnect':
+      reconnectAttempts = 0;
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+      if (ws) {
+        ws.close();
+      }
+      connect();
       break;
 
     case 'navigate':
@@ -304,6 +330,24 @@ function updateBadge() {
   chrome.action.setBadgeBackgroundColor({ color: colors[connectionState] });
   chrome.action.setBadgeText({ text: texts[connectionState] });
 }
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'getStatus') {
+    sendResponse({ connected: connectionState === 'connected' });
+  } else if (message.type === 'reconnect') {
+    reconnectAttempts = 0;
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+    }
+    if (ws) {
+      ws.close();
+    }
+    connect();
+    sendResponse({ status: 'connecting' });
+  }
+  return true;
+});
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log('Extension installed');
