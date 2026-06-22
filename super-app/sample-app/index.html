@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>示例计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .display .expression {
+            font-size: 16px;
+            color: #666;
+            min-height: 24px;
+        }
+
+        .display .result {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-number {
+            background: #fff;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-operator {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .btn-clear {
+            background: #ff6b6b;
+            color: #fff;
+        }
+
+        .btn-equals {
+            background: #51cf66;
+            color: #fff;
+        }
+
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="expression" id="expression"></div>
+            <div class="result" id="result">0</div>
+        </div>
+        <div class="buttons">
+            <button class="btn-clear" onclick="clearAll()">C</button>
+            <button class="btn-operator" onclick="appendToExpression('(')">(</button>
+            <button class="btn-operator" onclick="appendToExpression(')')">)</button>
+            <button class="btn-operator" onclick="appendToExpression('/')">÷</button>
+            
+            <button class="btn-number" onclick="appendToExpression('7')">7</button>
+            <button class="btn-number" onclick="appendToExpression('8')">8</button>
+            <button class="btn-number" onclick="appendToExpression('9')">9</button>
+            <button class="btn-operator" onclick="appendToExpression('*')">×</button>
+            
+            <button class="btn-number" onclick="appendToExpression('4')">4</button>
+            <button class="btn-number" onclick="appendToExpression('5')">5</button>
+            <button class="btn-number" onclick="appendToExpression('6')">6</button>
+            <button class="btn-operator" onclick="appendToExpression('-')">−</button>
+            
+            <button class="btn-number" onclick="appendToExpression('1')">1</button>
+            <button class="btn-number" onclick="appendToExpression('2')">2</button>
+            <button class="btn-number" onclick="appendToExpression('3')">3</button>
+            <button class="btn-operator" onclick="appendToExpression('+')">+</button>
+            
+            <button class="btn-number" onclick="appendToExpression('0')">0</button>
+            <button class="btn-number" onclick="appendToExpression('.')">.</button>
+            <button class="btn-clear" onclick="backspace()">⌫</button>
+            <button class="btn-equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <div class="info">
+        超级应用 - 示例计算器 v1.0.0
+    </div>
+
+    <script>
+        let expression = '';
+
+        function appendToExpression(value) {
+            expression += value;
+            document.getElementById('expression').textContent = expression;
+        }
+
+        function clearAll() {
+            expression = '';
+            document.getElementById('expression').textContent = '';
+            document.getElementById('result').textContent = '0';
+        }
+
+        function backspace() {
+            expression = expression.slice(0, -1);
+            document.getElementById('expression').textContent = expression;
+        }
+
+        function calculate() {
+            try {
+                const result = eval(expression);
+                document.getElementById('result').textContent = result;
+                expression = result.toString();
+            } catch (e) {
+                document.getElementById('result').textContent = '错误';
+                expression = '';
+            }
+        }
+
+        // 检查是否在超级应用环境中
+        if (typeof SuperApp !== 'undefined') {
+            console.log('Running in SuperApp, ID:', SuperApp.getAppId());
+        }
+    </script>
+</body>
+</html>
