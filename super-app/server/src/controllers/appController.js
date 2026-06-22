@@ -1,7 +1,10 @@
 const App = require('../models/App');
 const path = require('path');
 const fs = require('fs');
+const fsPromises = require('fs').promises;
 const AdmZip = require('adm-zip');
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 exports.getApps = async (req, res) => {
   try {
@@ -22,7 +25,8 @@ exports.getApps = async (req, res) => {
 
     res.json(apps);
   } catch (error) {
-    res.status(500).json({ message: '获取应用列表失败', error: error.message });
+    console.error('GetApps error:', error);
+    res.status(500).json({ message: '获取应用列表失败' });
   }
 };
 
@@ -34,7 +38,8 @@ exports.getAppById = async (req, res) => {
     }
     res.json(app);
   } catch (error) {
-    res.status(500).json({ message: '获取应用详情失败', error: error.message });
+    console.error('GetAppById error:', error);
+    res.status(500).json({ message: '获取应用详情失败' });
   }
 };
 
@@ -76,7 +81,8 @@ exports.createApp = async (req, res) => {
     await app.save();
     res.status(201).json(app);
   } catch (error) {
-    res.status(500).json({ message: '创建应用失败', error: error.message });
+    console.error('CreateApp error:', error);
+    res.status(500).json({ message: '创建应用失败' });
   }
 };
 
@@ -101,7 +107,11 @@ exports.updateApp = async (req, res) => {
       // Delete old icon
       if (app.icon && app.icon.startsWith('/uploads/')) {
         const oldIconPath = path.join(__dirname, '../../', app.icon);
-        fs.unlinkSync(oldIconPath);
+        try {
+          await fsPromises.unlink(oldIconPath);
+        } catch (e) {
+          console.warn('Failed to delete old icon:', e.message);
+        }
       }
       app.icon = `/uploads/icons/${req.files.icon[0].filename}`;
     }
@@ -111,7 +121,11 @@ exports.updateApp = async (req, res) => {
       // Delete old package
       if (app.packageUrl && app.packageUrl.startsWith('/uploads/')) {
         const oldPackagePath = path.join(__dirname, '../../', app.packageUrl);
-        fs.unlinkSync(oldPackagePath);
+        try {
+          await fsPromises.unlink(oldPackagePath);
+        } catch (e) {
+          console.warn('Failed to delete old package:', e.message);
+        }
       }
       app.packageUrl = `/uploads/packages/${req.files.package[0].filename}`;
       app.packageSize = req.files.package[0].size;
@@ -131,7 +145,8 @@ exports.updateApp = async (req, res) => {
     await app.save();
     res.json(app);
   } catch (error) {
-    res.status(500).json({ message: '更新应用失败', error: error.message });
+    console.error('UpdateApp error:', error);
+    res.status(500).json({ message: '更新应用失败' });
   }
 };
 
@@ -142,20 +157,24 @@ exports.deleteApp = async (req, res) => {
       return res.status(404).json({ message: '应用不存在' });
     }
 
-    // Delete files
+    // Delete files asynchronously
+    const filesToDelete = [];
     if (app.icon && app.icon.startsWith('/uploads/')) {
-      const iconPath = path.join(__dirname, '../../', app.icon);
-      fs.unlinkSync(iconPath);
+      filesToDelete.push(path.join(__dirname, '../../', app.icon));
     }
     if (app.packageUrl && app.packageUrl.startsWith('/uploads/')) {
-      const packagePath = path.join(__dirname, '../../', app.packageUrl);
-      fs.unlinkSync(packagePath);
+      filesToDelete.push(path.join(__dirname, '../../', app.packageUrl));
     }
+
+    await Promise.allSettled(
+      filesToDelete.map(filePath => fsPromises.unlink(filePath))
+    );
 
     await App.findByIdAndDelete(req.params.id);
     res.json({ message: '应用已删除' });
   } catch (error) {
-    res.status(500).json({ message: '删除应用失败', error: error.message });
+    console.error('DeleteApp error:', error);
+    res.status(500).json({ message: '删除应用失败' });
   }
 };
 
@@ -177,6 +196,7 @@ exports.downloadApp = async (req, res) => {
 
     res.download(packagePath, `${app.name}-${app.version}.zip`);
   } catch (error) {
-    res.status(500).json({ message: '下载失败', error: error.message });
+    console.error('DownloadApp error:', error);
+    res.status(500).json({ message: '下载失败' });
   }
 };
