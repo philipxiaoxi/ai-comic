@@ -21,6 +21,19 @@
         <v-icon size="80" color="grey-lighten-1">mdi-book-open-variant</v-icon>
         <span class="text-body-1 text-grey mt-4">暂无封面</span>
       </div>
+
+      <!-- 生成封面按钮（悬浮在封面右下角） -->
+      <v-btn
+        class="comic-info__generate-cover-btn"
+        color="primary"
+        :loading="generatingCover"
+        :disabled="generatingCover"
+        size="small"
+        @click="$emit('generate-cover')"
+      >
+        <v-icon left size="small">mdi-auto-fix</v-icon>
+        {{ comic.cover_image ? '重新生成封面' : '生成封面' }}
+      </v-btn>
     </div>
     
     <v-card-text class="comic-info__content">
@@ -133,10 +146,16 @@ const props = defineProps({
   exporting: {
     type: Boolean,
     default: false,
+  },
+
+  /** 封面生成中（按钮 loading） */
+  generatingCover: {
+    type: Boolean,
+    default: false,
   }
 })
 
-defineEmits(['edit-title', 'edit-style', 'view-novel', 'preview', 'export'])
+defineEmits(['edit-title', 'edit-style', 'view-novel', 'preview', 'export', 'generate-cover'])
 
 // 计算封面图片
 const coverImage = computed(() => {
@@ -175,6 +194,18 @@ function formatDate(dateStr) {
 
 .comic-info:hover .comic-info__image {
   transform: scale(1.05);
+}
+
+.comic-info__generate-cover-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 1;
+  text-transform: none;
+  font-weight: 500;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
 }
 
 .comic-info__placeholder {

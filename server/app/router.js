@@ -39,6 +39,7 @@ module.exports = app => {
   router.get('/api/comics/:id', app.middleware.jwt(), controller.comic.show);
   router.put('/api/comics/:id', app.middleware.jwt(), controller.comic.update);
   router.delete('/api/comics/:id', app.middleware.jwt(), controller.comic.destroy);
+  router.post('/api/comics/:id/generate-cover', app.middleware.jwt(), controller.comic.generateCover);
   router.post('/api/comics/:id/chapters/batch', app.middleware.jwt(), controller.comic.createChapters);
 
   // 章节相关（需要登录）

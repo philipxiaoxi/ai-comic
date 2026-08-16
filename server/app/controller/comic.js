@@ -79,6 +79,25 @@ class ComicController extends Controller {
     }
   }
 
+  async generateCover() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const { providerId, prompt, size } = ctx.request.body || {};
+
+    try {
+      const comic = await ctx.service.comic.generateCover(
+        parseInt(id),
+        ctx.state.user.id,
+        { providerId, prompt, size }
+      );
+
+      ctx.body = { comic };
+    } catch (err) {
+      ctx.status = err.status || 500;
+      ctx.body = { error: err.message };
+    }
+  }
+
   async createChapters() {
     const { ctx } = this;
     const { id: comicId } = ctx.params;

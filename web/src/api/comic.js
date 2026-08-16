@@ -27,6 +27,11 @@ export default {
     return res.data
   },
 
+  async generateCover(id, data = {}) {
+    const res = await api.post(`/comics/${id}/generate-cover`, data)
+    return res.data
+  },
+
   async deleteComic(id) {
     const res = await api.delete(`/comics/${id}`)
     return res.data

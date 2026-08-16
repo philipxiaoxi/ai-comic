@@ -13,7 +13,7 @@
     "@anthropic-ai/sdk": "^0.115.0",
     "axios": "^1.6.0",
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^11.0.0",
+    "better-sqlite3": "^13.0.3",
     "cos-nodejs-sdk-v5": "^2.15.4",
     "egg": "^3.17.0",
     "egg-scripts": "^2.17.0",

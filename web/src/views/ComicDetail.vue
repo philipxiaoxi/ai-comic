@@ -53,11 +53,13 @@
               :comic="comic"
               :has-novel="hasNovel"
               :exporting="exporting"
+              :generating-cover="generatingCover"
               @edit-title="startEditTitle"
               @edit-style="openStyleDialog"
               @view-novel="openNovelDialog"
               @preview="openPreview"
               @export="exportPdf"
+              @generate-cover="generateCover"
             />
           </v-col>
           
@@ -234,6 +236,7 @@ const deleting = ref(false)
 const showPreview = ref(false)
 const showNoImageHint = ref(false)
 const exporting = ref(false)
+const generatingCover = ref(false)
 const editingTitle = ref(false)
 const editTitleValue = ref('')
 const savingTitle = ref(false)
@@ -398,6 +401,24 @@ async function exportPdf() {
     alert('导出失败，请重试')
   } finally {
     exporting.value = false
+  }
+}
+
+// 生成漫画封面（复用后端 aiImage.generateFromPrompt）
+async function generateCover() {
+  if (generatingCover.value || !comic.value) return
+
+  generatingCover.value = true
+  try {
+    const res = await comicApi.generateCover(comic.value.id)
+    if (res.comic) {
+      comic.value = { ...comic.value, ...res.comic }
+    }
+  } catch (e) {
+    console.error('生成封面失败', e)
+    alert('生成封面失败：' + (e.response?.data?.error || e.message))
+  } finally {
+    generatingCover.value = false
   }
 }
 
