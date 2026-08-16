@@ -13,7 +13,7 @@
         :src="coverImage"
         :alt="comic.title"
         height="240"
-        cover
+        position="center"
         class="comic-card__image"
       >
         <template #placeholder>
@@ -190,6 +190,7 @@ function formatDate(dateStr) {
 .comic-card__image-container {
   position: relative;
   overflow: hidden;
+  background: var(--color-surface-variant);
 }
 
 .comic-card__image {

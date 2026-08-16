@@ -23,7 +23,7 @@
                 :src="comic.cover"
                 :alt="comic.title"
                 height="240"
-                cover
+                position="center"
                 class="showcase-card__img"
               >
                 <template #placeholder>
@@ -173,6 +173,7 @@ defineEmits(['comic-click', 'view-all'])
 .showcase-card__image {
   position: relative;
   overflow: hidden;
+  background: var(--color-surface-variant);
 }
 
 .showcase-card__img {

@@ -7,7 +7,7 @@
         :src="coverImage"
         :alt="comic.title"
         height="300"
-        cover
+        position="center"
         class="comic-info__image"
       >
         <template #placeholder>
@@ -186,6 +186,7 @@ function formatDate(dateStr) {
 .comic-info__image-container {
   position: relative;
   overflow: hidden;
+  background: var(--color-surface-variant);
 }
 
 .comic-info__image {
